@@ -1,39 +1,10 @@
-const express = require('express');
-const bodyparser = require('body-parser')
+const mongoose = require('mongoose');
+const MONGODB_URL = "mongodb+srv://root:1234@test-oymtp.mongodb.net/test?retryWrites=true&w=majority"
 
-const server = express();
-server.use(bodyparser.json());
-const users = [
-    {
-        id:"dfdfdfdf",
-        name:"dlwlsgk",
-        email:"ddd@dfdfff"
-    },
-    {
-        id:"dffffddddd",
-        name:"ssssss",
-        email:"ddd@dddfdfdfdfdfdf"
-    }
-]
-
-server.get("/api/user",function(req,res){
-    res.json(users);
-});
-server.get("/api/user/:id",(req,res) => { //:id ㄱㅏ id를 파라미터로 받는다는뜻
-    const user = users.find((u)=>{
-        return u.id === req.params.id;
-    });
-    if(user){
-        res.json(user);
+mongoose.connect(MONGODB_URL, {useNewUrlParser : true} , (err) => {
+    if(err){
+        console.log(err);
     }else{
-        res.status(404).json({errorMessage: "User not found"});
+        console.log("Connected to DB Successfully");
     }
-});
-server.post("/api/user",function(req,res){
-    console.log(req.body);
-    users.push(req.body);
-    res.json(users);
-})
-server.listen(3000 , function(){
-    console.log("Server is running");
 })
