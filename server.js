@@ -8,23 +8,28 @@ require("dotenv").config({ path : './variables.env' });
 server.use(bodyParser.urlencoded({ extended: true }));
 server.use(bodyParser.json());
 
-server.get('/',(req,res)=>{
-    const newUser = new User();
-    newUser.email = "dkwlsfk22@naver.com";
-    newUser.name = "이진하";
-    newUser.phone = 1033662794 ;
-    newUser.save()
-        .then((user)=>{
-            console.log(user);
-            res.json({
-                message:" User Created Successfully"
-            });
-        })
-        .catch((err)=>{
-            res.json({
-                message:" User was not Created Successfully"
-            });
-        });
+//Read User
+server.get('/api/User',(req,res)=>{
+    // const newUser = new User();
+    // newUser.email = "dkwlsfk22@naver.com";
+    // newUser.name = "이진하";
+    // newUser.phone = 1033662794 ;
+    // newUser.save()
+    //     .then((user)=>{
+    //         console.log(user);
+    //         res.json({
+    //             message:" User Created Successfully"
+    //         });
+    //     })
+    //     .catch((err)=>{
+    //         res.json({
+    //             message:" User was not Created Successfully"
+    //         });
+    //     });
+    User.find(function(err, users){
+        if(err) return res.status(500).send({error : 'databas failure'});
+        res.json(users);
+    })
 });
 //Create User
 server.post('/api/User',(req,res)=>{
@@ -46,7 +51,22 @@ server.post('/api/User',(req,res)=>{
 })
 
 //Update user
-server.put('')
+server.put('/api/User/:user_id',function(req,res){
+    User.update({_id: req.params.user_id},{$set: req.body}, function(err,output){
+        if(err) res.status(500).json({error : ' database failure'});
+        console.log(output);
+        if(!output.n) return res.status(404).json({error : 'User not found'});
+        res.json({message: 'User updated'});
+    })
+});
+
+//Delete user
+server.delete('/api/User/:user_id',function(req,res){
+    User.remove({_id: req.params.user_id},{$set: req.body},function(err,output){
+        if(err) res.status(500).json({error : ' database failure'});
+        res.status(204).end();
+    })
+})
 
 server.listen(3000, err =>{
     if(err){
