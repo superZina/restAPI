@@ -26,17 +26,24 @@ server.get('/api/User',(req,res)=>{
     //             message:" User was not Created Successfully"
     //         });
     //     });
+
+    
     User.find(function(err, users){
         if(err) return res.status(500).send({error : 'databas failure'});
         res.json(users);
     })
 });
+
+
+
 //Create User
 server.post('/api/User',(req,res)=>{
     var user = new User();
     user.name = req.body.name;
     user.email = req.body.email;
     user.phone = req.body.phone;
+    user.id = req.body.id;
+    user.password = req.body.password;
 
     user.save(function(err){
         if(err){
