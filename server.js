@@ -4,7 +4,7 @@ const bodyParser = require('body-parser');
 const server = express();
 const User = require('./models/User');
 require("dotenv").config({ path : './variables.env' });
-
+//mongodb+srv://root:1234@test-oymtp.mongodb.net/test?retryWrites=true&w=majority
 server.use(bodyParser.urlencoded({ extended: true }));
 server.use(bodyParser.json());
 
@@ -55,6 +55,7 @@ server.post('/api/User',(req,res)=>{
         res.json({result: 1});
 
     })
+
 })
 
 //Update user
@@ -84,6 +85,7 @@ server.listen(3000, err =>{
                 console.log(err);
             }else{
                 console.log("Connected to DB Successfully")
+                console.log(mongoose.connection.db)
             }
         });
     }
