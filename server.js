@@ -1,31 +1,23 @@
+
+var MongoClient = require('mongodb').MongoClient;
+var ObjectId = require('mongodb').ObjectID;
+var assert = require('assert');
+var async = require('async');
+var url = 'mongodb+srv://dbamdin:admin1234!@cluster0-9wasi.mongodb.net/test?retryWrites=true&w=majority'
+
 const express = require('express');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
-const server = express();
 const User = require('./models/User');
 require("dotenv").config({ path : './variables.env' });
-//mongodb+srv://root:1234@test-oymtp.mongodb.net/test?retryWrites=true&w=majority
+
+
+const server = express();
 server.use(bodyParser.urlencoded({ extended: true }));
 server.use(bodyParser.json());
 
 //Read User
 server.get('/api/User',(req,res)=>{
-    // const newUser = new User();
-    // newUser.email = "dkwlsfk22@naver.com";
-    // newUser.name = "이진하";
-    // newUser.phone = 1033662794 ;
-    // newUser.save()
-    //     .then((user)=>{
-    //         console.log(user);
-    //         res.json({
-    //             message:" User Created Successfully"
-    //         });
-    //     })
-    //     .catch((err)=>{
-    //         res.json({
-    //             message:" User was not Created Successfully"
-    //         });
-    //     });
 
     
     User.find(function(err, users){
@@ -33,6 +25,7 @@ server.get('/api/User',(req,res)=>{
         res.json(users);
     })
 });
+
 
 
 
@@ -58,6 +51,18 @@ server.post('/api/User',(req,res)=>{
 
 })
 
+server.post('/connect_mongodb',function(req,res){
+    console.log('connect mongodb....');
+
+    connect_mongodb(res);
+})
+
+server.post('/connect_mongodb/find',function(req,res){
+    console.log('find mongodb.....');
+
+    find_gps(res);
+})
+
 //Update user
 server.put('/api/User/:user_id',function(req,res){
     User.update({_id: req.params.user_id},{$set: req.body}, function(err,output){
@@ -80,13 +85,69 @@ server.listen(3000, err =>{
     if(err){
         return console.log(err);
     }else{
+        
         mongoose.connect(process.env.MONGODB_URL, {useNewUrlParser : true} , (err) => {
             if(err){
                 console.log(err);
             }else{
                 console.log("Connected to DB Successfully")
-                console.log(mongoose.connection.db)
+                
             }
         });
     }
 });
+
+function connect_mongodb(res){
+    async.waterfall([
+        function(callback){
+            MongoClient.connect(url , function(err , db){
+                assert.equal(null , err);
+
+                console.log('Connected correctly to sesrver');
+
+                db.close();
+
+                callback(null, 'connect mongodb');
+            });
+        }
+    ],
+    function(callback, message) {
+        res.send(message);
+        console.log('--------------------------');
+    }
+    
+    );
+}
+
+function find_gps(res) {
+    async.waterfall([
+        function(callback){
+            MongoClient.connect(url, function(err, db) {
+                if(err) throw err;
+                var dbo = db.db("mydb");
+
+                // dbo.collection("GPS").find({nmae : "Long"}, function( err, result){
+                //     if(err) throw err;
+                //     console.log(result.value);
+                //     db.close();
+                //     callback(null , 'find........',result)
+                // });
+                dbo.collection("GPS" , function(err,collection) {
+                    collection.find().toArray(function(err,result) {
+                        console.log(result.values)
+                        db.close()
+                        callback(null , 'find........',result)
+                    })
+                })
+            });
+            
+        }
+        
+    ],
+    function(callback, message, result) {
+        // res.send(message);
+        res.send(result)
+        console.log('--------------------------');
+    }
+    );
+}
