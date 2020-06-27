@@ -3,7 +3,7 @@ var MongoClient = require('mongodb').MongoClient;
 var ObjectId = require('mongodb').ObjectID;
 var assert = require('assert');
 var async = require('async');
-var url = 'mongodb+srv://dbamdin:admin1234!@cluster0-9wasi.mongodb.net/test?retryWrites=true&w=majority'
+var url =  'mongodb+srv://dbamdin:admin1234!@cluster0-9wasi.mongodb.net/BLSDB?retryWrites=true&w=majority'
 
 const express = require('express');
 const mongoose = require('mongoose');
@@ -124,14 +124,7 @@ function find_gps(res) {
         function(callback){
             MongoClient.connect(url, function(err, db) {
                 if(err) throw err;
-                var dbo = db.db("mydb");
-
-                // dbo.collection("GPS").find({nmae : "Long"}, function( err, result){
-                //     if(err) throw err;
-                //     console.log(result.value);
-                //     db.close();
-                //     callback(null , 'find........',result)
-                // });
+                var dbo = db.db("BLSDB");
                 dbo.collection("GPS" , function(err,collection) {
                     collection.find().toArray(function(err,result) {
                         console.log(result.values)
